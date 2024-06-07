@@ -1,0 +1,46 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  Install:
+    name: install dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.5.7"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: python3 -m pip install --user ansible
+
+      - name: az login
+        run: "az login"
+
+      - name: Init terraform
+        id: init
+        run: "terraform init"
+
+      - name: Validate Terraform
+        id: validate
+        run: "terraform validate -no-color"
+
+      - name: Apply Terraform
+        id: apply
+        run: |
+          export TF_VAR_PRIVATE_KEY="${{secrets.PRIVATE_KEY}}"
+          export TF_VAR_PUBLIC_KEY="${{secrets.PUBLIC_KEY}}"
+          echo -e "${{secrets.PRIVATE_KEY}}" > /tmp/ansible
+          chmod 400 /tmp/ansible
+          terraform apply -var-file platforms/terraform.tfvars -auto-approve
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.SEMVER_TOKEN }}
