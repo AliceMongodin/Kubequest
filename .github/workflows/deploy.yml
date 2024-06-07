@@ -40,7 +40,7 @@ jobs:
           export TF_VAR_PUBLIC_KEY="${{secrets.PUBLIC_KEY}}"
           echo -e "${{secrets.PRIVATE_KEY}}" > /tmp/ansible
           chmod 400 /tmp/ansible
-          terraform apply -var-file platforms/terraform.tfvars -auto-approve
+          terraform apply -var-file terraform.tfvars -auto-approve
 
     env:
       GITHUB_TOKEN: ${{ secrets.SEMVER_TOKEN }}
