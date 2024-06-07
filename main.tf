@@ -1,4 +1,4 @@
-data "azurerm_resource_group" "t-kubquest" {
+data "azurerm_resource_group" "t-kubequest" {
   name = var.global_name
 }
 
